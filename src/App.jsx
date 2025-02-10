@@ -6,7 +6,7 @@ import { useDebounce } from 'react-use';
 import { updateSearchCount, getTendingMovies } from './appwrite';
 
 const API_BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = import.meta.env.VITE_TMBD_API_KEY;
+const API_KEY = import.meta.env.VITE_TMBD_API_KEY; // Asegúrate de que esto esté en tu .env
 const API_OPTIONS = {
   method: 'GET',
   headers: {
@@ -23,7 +23,7 @@ const App = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('');
-  const [trendingMovies, setTrendingMovies] = useState([])
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   const fetchGenres = async () => {
     try {
@@ -43,7 +43,7 @@ const App = () => {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      let endpoint = query 
+      let endpoint = query
         ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
         : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
@@ -54,8 +54,8 @@ const App = () => {
       const data = await response.json();
       if (data.results) {
         setMovieList(data.results);
-        if(query && data.results.length > 0){
-          await updateSearchCount(query,data.results[0])
+        if (query && data.results.length > 0) {
+          await updateSearchCount(query, data.results[0]);
         }
       } else {
         setErrorMessage('No movies found.');
@@ -69,19 +69,18 @@ const App = () => {
     }
   };
 
-  const loadTrendingMovies = async () =>{
+  const loadTrendingMovies = async () => {
     try {
-      const movies = await getTendingMovies()
-      setTrendingMovies(movies)
+      const movies = await getTendingMovies();
+      setTrendingMovies(movies);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   useEffect(() => {
-    loadTrendingMovies()
-  }, [])
-  
+    loadTrendingMovies();
+  }, []);
 
   useEffect(() => {
     fetchGenres();
@@ -108,7 +107,9 @@ const App = () => {
               <button
                 key={genre.id}
                 className={`px-4 py-2 rounded ${
-                  selectedGenre === genre.id.toString() ? 'bg-purple-600 text-white rounded-2xl' : 'bg-dark-100 shadow-light-100/10 text-white rounded-2xl shadow-inner'
+                  selectedGenre === genre.id.toString()
+                    ? 'bg-purple-600 text-white rounded-2xl'
+                    : 'bg-dark-100 shadow-light-100/10 text-white rounded-2xl shadow-inner'
                 }`}
                 onClick={() => setSelectedGenre(selectedGenre === genre.id.toString() ? '' : genre.id.toString())}
               >
@@ -118,28 +119,34 @@ const App = () => {
           </div>
         </header>
 
-        {trendingMovies.length>0 && (<section className='trending'><h2>Trending Movies</h2>
-        <ul>
-          {trendingMovies.map((movie,index)=>(
-            <li key={movie.$id}>
-              <p>{index+1}</p>
-              <img src={movie.poster_url} alt={movie.title} />
-            </li>
-          ))}
-        </ul>
-        </section>)}
+        {trendingMovies.length > 0 && (
+          <section className='trending'>
+            <h2>Trending Movies</h2>
+            <ul>
+              {trendingMovies.map((movie, index) => (
+                <li key={movie.$id}>
+                  <p>{index + 1}</p>
+                  <img src={movie.poster_url} alt={movie.title} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <section className='all-movies'>
           <h2>Popular</h2>
           {isLoading ? (
             <Spinner />
           ) : errorMessage ? (
             <p className='text-red-500'>{errorMessage}</p>
-          ) : (
+          ) : movieList.length > 0 ? (
             <ul>
               {movieList.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </ul>
+          ) : (
+            <p>No movies found.</p>
           )}
         </section>
       </div>
