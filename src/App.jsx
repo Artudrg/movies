@@ -6,7 +6,7 @@ import { useDebounce } from 'react-use';
 import { updateSearchCount, getTendingMovies } from './appwrite';
 
 const API_BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = import.meta.env.VITE_TMBD_API_KEY; // Asegúrate de que esto esté en tu .env
+const API_KEY = import.meta.env.VITE_TMBD_API_KEY;
 const API_OPTIONS = {
   method: 'GET',
   headers: {
@@ -119,7 +119,7 @@ const App = () => {
           </div>
         </header>
 
-        {trendingMovies.length > 0 && (
+        {trendingMovies.length > 0 ? (
           <section className='trending'>
             <h2>Trending Movies</h2>
             <ul>
@@ -131,6 +131,8 @@ const App = () => {
               ))}
             </ul>
           </section>
+        ) : (
+          <p>No trending movies found.</p>
         )}
 
         <section className='all-movies'>
